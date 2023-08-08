@@ -1,0 +1,36 @@
+name: ParkourChallenge
+version: '${project.version}'
+main: io.github.cardsandhuskers.parkourchallenge.ParkourChallenge
+api-version: 1.19
+authors: [ cardsandhuskers ]
+softdepend: [Multiverse-Core, PlaceholderAPI]
+depend: [Teams]
+description: Parkour game plugin
+commands:
+  startParkour:
+    description: starts the game
+    usage: /<command>
+  setParkourSpawn:
+    description: sets the world spawn location
+    usage: /<command>
+  setParkourLobby:
+    description: sets the lobby location
+    usage: /<command>
+  reloadParkour:
+    description: reloads config for parkour
+    usage: /<command>
+  cancelParkour:
+    description: cancels the parkour game
+    usage: /<command>
+  setParkourLevelStart:
+    description: sets the start point for a level
+    usage: /<command> [levelNum]
+  setParkourLevelEnd:
+    description: gives you a rod to mark the area at the end of a level
+    usage: /<command> [levelNum]
+  verifyParkourSelection:
+    description: used to verify the selection with the rod
+    usage: /<command>
+  setParkourStartWall:
+    description: gives you a rod to mark the area to place a wall to block people from starting the parkour until the start time
+    usage: /<command>

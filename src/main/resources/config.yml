@@ -1,0 +1,14 @@
+PregameTime: 45
+GameTime: 720
+PostgameTime: 30
+
+#1st place points
+maxPoints: 25
+#subtract this from 25 for each player ahead
+dropOff: 1
+
+#y-level where the player should be teleported back up
+minY: 40
+
+#number of fails to give a skip item
+numFails: 20
