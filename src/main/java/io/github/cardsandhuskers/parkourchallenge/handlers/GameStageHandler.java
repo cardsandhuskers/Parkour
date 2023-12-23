@@ -7,6 +7,7 @@ import io.github.cardsandhuskers.parkourchallenge.listeners.PlayerMoveListener;
 import io.github.cardsandhuskers.parkourchallenge.listeners.PlayerClickListener;
 import io.github.cardsandhuskers.parkourchallenge.objects.Countdown;
 import io.github.cardsandhuskers.parkourchallenge.objects.GameMessages;
+import io.github.cardsandhuskers.teams.handlers.TeamHandler;
 import io.github.cardsandhuskers.teams.objects.Team;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
@@ -63,7 +64,7 @@ public class GameStageHandler {
                     Location spawn = plugin.getConfig().getLocation("spawn");
                     for(Player p:Bukkit.getOnlinePlayers()) {
                         p.teleport(spawn);
-                        if(handler.getPlayerTeam(p) != null) {
+                        if(TeamHandler.getInstance().getPlayerTeam(p) != null) {
                             p.setGameMode(GameMode.ADVENTURE);
                         } else {
                             p.setGameMode(GameMode.SPECTATOR);
@@ -79,7 +80,7 @@ public class GameStageHandler {
                         p.sendTitle(ChatColor.GREEN + "GO!", "", 5, 20, 5);
                         p.getInventory().clear();
 
-                        if(handler.getPlayerTeam(p) != null) {
+                        if(TeamHandler.getInstance().getPlayerTeam(p) != null) {
                             p.setGameMode(GameMode.ADVENTURE);
                             levelHandler.prepPlayer(p);
                         } else {
@@ -123,7 +124,7 @@ public class GameStageHandler {
                 //Timer Start
                 () -> {
                     ParkourChallenge.gameState = ParkourChallenge.State.GAME_IN_PROGRESS;
-                    for(Team t:handler.getTeams()) {
+                    for(Team t: TeamHandler.getInstance().getTeams()) {
                         for(Player p: t.getOnlinePlayers()) {
                             if(p.getGameMode() != GameMode.ADVENTURE) levelHandler.resetPlayer(p);
                         }
@@ -156,12 +157,6 @@ public class GameStageHandler {
      * Triggers the messages in the console for performance
      */
     public void gameEndTimer() {
-        for(Player p:Bukkit.getOnlinePlayers()) {
-            p.setInvisible(false);
-            p.setGameMode(GameMode.SPECTATOR);
-        }
-        HandlerList.unregisterAll(plugin);
-
         gameEndTimer = new Countdown((JavaPlugin)plugin,
                 //should be 60
                 plugin.getConfig().getInt("PostgameTime"),
@@ -169,11 +164,16 @@ public class GameStageHandler {
                 () -> {
                     Bukkit.broadcastMessage(ChatColor.GREEN + "GAME OVER!");
                     for(Player p:Bukkit.getOnlinePlayers()) {
+                        p.setGameMode(GameMode.SPECTATOR);
                         p.playSound(p.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1F);
                         p.sendTitle(ChatColor.GREEN + "GAME OVER", "", 5, 20, 5);
+                        for(Player target: Bukkit.getOnlinePlayers()) {
+                            p.showPlayer(plugin, target);
+                        }
+
                     }
                     ParkourChallenge.timeVar = 0;
-
+                    HandlerList.unregisterAll(plugin);
                     ParkourChallenge.gameState = ParkourChallenge.State.GAME_OVER;
 
                 },

@@ -34,6 +34,13 @@ public class CancelGameCommand implements CommandExecutor {
         boolean success = startGameCommand.cancelTimers();
         if(success) {
             HandlerList.unregisterAll(plugin);
+            for(Player p:Bukkit.getOnlinePlayers()) {
+                for(Player target: Bukkit.getOnlinePlayers()) {
+                    p.showPlayer(plugin, target);
+                }
+            }
+
+
             Location lobby = plugin.getConfig().getLocation("lobby");
             for(Player p: Bukkit.getOnlinePlayers()) {
                 p.teleport(lobby);

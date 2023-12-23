@@ -11,6 +11,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 
 import java.util.Objects;
 
+import static io.github.cardsandhuskers.parkourchallenge.ParkourChallenge.gameState;
 import static io.github.cardsandhuskers.parkourchallenge.ParkourChallenge.handler;
 
 public class PlayerJoinListener implements Listener {
@@ -28,13 +29,13 @@ public class PlayerJoinListener implements Listener {
         if(handler.getPlayerTeam(p) != null) {
             levelHandler.resetPlayer(e.getPlayer());
             levelHandler.prepPlayer(e.getPlayer());
-            Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> p.setGameMode(GameMode.ADVENTURE),5L);
+            Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> p.setGameMode(GameMode.ADVENTURE),2L);
         }
         else {
             try{p.teleport(Objects.requireNonNull(plugin.getConfig().getLocation("spawn")));}catch (NullPointerException ex) {
                 plugin.getLogger().severe("Parkour World Spawn is Missing!");
             };
-            Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> p.setGameMode(GameMode.SPECTATOR),5L);
+            Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> p.setGameMode(GameMode.SPECTATOR),2L);
         }
     }
 }

@@ -109,7 +109,6 @@ public class LevelHandler {
             playersCompleted.put(playerLevel, playersCompleted.get(playerLevel) + 1);
             if(playerLevel == numLevels) {
                 p.setGameMode(GameMode.SPECTATOR);
-                p.setInvisible(false);
                 p.sendMessage("You finished all the levels!");
             }
         }
@@ -162,7 +161,6 @@ public class LevelHandler {
 
         if(playerLevel == numLevels) {
             p.setGameMode(GameMode.SPECTATOR);
-            p.setInvisible(false);
             p.sendMessage("You finished all the levels!");
         }
     }
@@ -260,7 +258,7 @@ public class LevelHandler {
      * @param p - player
      */
     public void prepPlayer(Player p) {
-        Team team = handler.getPlayerTeam(p);
+        Team team = TeamHandler.getInstance().getPlayerTeam(p);
         ItemStack boots = new ItemStack(Material.LEATHER_BOOTS, 1);
         LeatherArmorMeta bootsMeta = (LeatherArmorMeta) boots.getItemMeta();
         if(handler.getPlayerTeam(p) != null) {
@@ -275,7 +273,12 @@ public class LevelHandler {
         placeholderRodMeta.setDisplayName("Placeholder Rod");
         placeholderRodMeta.setLore(Collections.singletonList("Since you have no hand, hold this if it helps you"));
 
-        p.setInvisible(true);
+        for(Player target:Bukkit.getOnlinePlayers()) {
+            if(TeamHandler.getInstance().getPlayerTeam(target) != team) {
+                p.hidePlayer(plugin, target);
+                target.hidePlayer(plugin, p);
+            }
+        }
 
     }
     public int getCurrentLevel(Player p) {
