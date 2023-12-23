@@ -2,7 +2,8 @@ package io.github.cardsandhuskers.parkourchallenge.handlers;
 
 import io.github.cardsandhuskers.parkourchallenge.ParkourChallenge;
 import io.github.cardsandhuskers.parkourchallenge.objects.GameMessages;
-import io.github.cardsandhuskers.teams.Teams;
+import io.github.cardsandhuskers.parkourchallenge.objects.Level;
+import io.github.cardsandhuskers.teams.handlers.TeamHandler;
 import io.github.cardsandhuskers.teams.objects.Team;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
@@ -29,20 +30,29 @@ public class LevelHandler {
         this.plugin = plugin;
     }
 
+    /**
+     * Registers all of the levels into the level hashmap
+     * Accesses the config file to obtain the locations of each level's start and end points
+     */
     public void registerLevels() {
         levels = new HashMap<>();
         //populate lists
         int counter = 1;
         while(plugin.getConfig().getLocation("levels." + counter) != null) {
-            Location spawn = plugin.getConfig().getLocation("levels." + counter);
-            //Location plate = plugin.getConfig().getLocation("plates." + counter);
-            Location endA = plugin.getConfig().getLocation("end." + counter + ".1");
-            Location endB = plugin.getConfig().getLocation("end." + counter + ".2");
+            try {
+                Location spawn = plugin.getConfig().getLocation("levels." + counter);
+                //Location plate = plugin.getConfig().getLocation("plates." + counter);
+                Location endA = plugin.getConfig().getLocation("end." + counter + ".1");
+                Location endB = plugin.getConfig().getLocation("end." + counter + ".2");
 
-            if(endA != null && endB != null) {
-                levels.put(counter, new Level(counter, spawn, endA, endB));
-            } else {
-                plugin.getLogger().warning("Level " + counter + " has an invalid end area");
+                if (endA != null && endB != null) {
+                    levels.put(counter, new Level(counter, spawn, endA, endB));
+                } else {
+                    plugin.getLogger().warning("Level " + counter + " has an invalid end area");
+                }
+            } catch (Exception e) {
+                System.out.println("ERROR BUILDING LEVEL: " + counter);
+                e.printStackTrace();
             }
 
             counter++;
@@ -67,8 +77,9 @@ public class LevelHandler {
     }
 
     /**
-     * runs and checks if the player has completed the level they're currently on. If so, handles
-     * @param p
+     * runs and checks if the player has completed the level they're currently on. If so, handles the win behavior:
+     * updates level as completed and plays fireworks/sounds
+     * @param p - player
      */
     public void onLevelComplete(Player p) {
         UUID u = p.getUniqueId();
@@ -108,8 +119,13 @@ public class LevelHandler {
             //TODO: Game Over!
         }
     }
+
+    /**
+     * Increments the amount of time a player has been on a level every second
+     * In order to use a skip, there is a minimum amount of time that a player must be on a level for.
+     */
     public void incrementTime() {
-        for(Team team: Teams.handler.getTeams()) {
+        for(Team team: TeamHandler.getInstance().getTeams()) {
             for(Player p:team.getOnlinePlayers()) {
                 UUID u = p.getUniqueId();
                 if(levelTime.containsKey(u)) levelTime.put(u, levelTime.get(u) + 1);
@@ -118,9 +134,15 @@ public class LevelHandler {
         }
     }
 
+    /**
+     * Runs when a player uses their level skip. Updates their level and removes the item from their inventory
+     * @param p
+     */
     public void onLevelSkip(Player p) {
         UUID u = p.getUniqueId();
         int playerLevel = currentLevels.get(u);
+        if(playerLevel >= numLevels) return;
+
         currentLevels.put(u, playerLevel + 1);
         currentFails.put(u, 0);
         levelTime.put(u, 0);
@@ -145,6 +167,12 @@ public class LevelHandler {
         }
     }
 
+    /**
+     * Handles the logic for giving points to a player after completing a level
+     * Also handles sending the messages
+     * @param p - player
+     * @param level - level player just completed
+     */
     public void givePoints(Player p, int level) {
         p.setHealth(20);
         p.setFoodLevel(20);
@@ -153,15 +181,10 @@ public class LevelHandler {
 
         if(handler.getPlayerTeam(p) != null) {
             Team t = handler.getPlayerTeam(p);
-            double maxPoints = plugin.getConfig().getInt("maxPoints") * multiplier;
+            double maxPoints = plugin.getConfig().getDouble("maxPoints") * multiplier;
             double dropOff = plugin.getConfig().getDouble("dropOff") * multiplier;
 
             double points = maxPoints - (dropOff * numCompleted);
-
-            if(numCompleted == 0) {
-                //TODO: add a win to the player
-            }
-
 
             for (Player player : Bukkit.getOnlinePlayers()) {
                 String message;
@@ -189,21 +212,27 @@ public class LevelHandler {
             }
             t.addTempPoints(p, points);
         }
-
-
     }
 
+    /**
+     * Resets a player to the beginning of a level after they fail it
+     * @param p - player
+     */
     public void resetPlayer(Player p) {
         UUID u = p.getUniqueId();
         int level = currentLevels.get(u);
         p.teleport(levels.get(level).start);
 
         if(currentFails.containsKey(u) && currentFails.get(u) >= numFails &&
-                levelTime.containsKey(u) && levelTime.get(u) >= 60) {
+                levelTime.containsKey(u) && levelTime.get(u) >= plugin.getConfig().getInt("levelTime")) {
             giveSkipItem(p);
         }
     }
 
+    /**
+     * Adds a fall to a player's count
+     * @param p - player
+     */
     public void addFail(Player p) {
         UUID u = p.getUniqueId();
         if(totalFails.containsKey(u)) totalFails.put(u, totalFails.get(u) + 1);
@@ -213,6 +242,10 @@ public class LevelHandler {
         else currentFails.put(u, 1);
     }
 
+    /**
+     * Gives a player a skip item, called when they've earned one
+     * @param p - player
+     */
     public void giveSkipItem(Player p) {
         ItemStack skipItem = new ItemStack(Material.GOLD_BLOCK);
         ItemMeta skipItemMeta = skipItem.getItemMeta();
@@ -222,6 +255,10 @@ public class LevelHandler {
         p.getInventory().setItem(4, skipItem);
     }
 
+    /**
+     * Preps a player, gives them boots and a blaze rod, though blaze rod should be phased out in favor of fake invisibility
+     * @param p - player
+     */
     public void prepPlayer(Player p) {
         Team team = handler.getPlayerTeam(p);
         ItemStack boots = new ItemStack(Material.LEATHER_BOOTS, 1);
@@ -240,7 +277,6 @@ public class LevelHandler {
 
         p.setInvisible(true);
 
-
     }
     public int getCurrentLevel(Player p) {
         return currentLevels.getOrDefault(p.getUniqueId(), 0);
@@ -255,41 +291,5 @@ public class LevelHandler {
 
     public int getPlayerWins(Player p) {
         return levelWins.getOrDefault(p.getUniqueId(), 0);
-    }
-
-    class Level {
-        public int levelNum;
-        public Location start;
-        public int lowerX, lowerY, lowerZ, higherX, higherY, higherZ;
-        public Level(int levelNum, Location start, Location endA, Location endB) {
-            this.levelNum = levelNum;
-            this.start = start;
-            setCoordinates(endA, endB);
-
-        }
-
-        public void setCoordinates(Location locA, Location locB) {
-            lowerX = Math.min(locA.getBlockX(), locB.getBlockX());
-            higherX = Math.max(locA.getBlockX(), locB.getBlockX());
-
-            lowerY = Math.min(locA.getBlockY(), locB.getBlockY());
-            higherY = lowerY + 5;
-
-            lowerZ = Math.min(locA.getBlockZ(), locB.getBlockZ());
-            higherZ = Math.max(locA.getBlockZ(), locB.getBlockZ());
-
-            higherX++;
-            higherZ++;
-        }
-
-        public boolean playerInEnd(Player p) {
-            Location playerLoc = p.getLocation();
-            if( playerLoc.getX() >= lowerX && playerLoc.getX() <= higherX &&
-                playerLoc.getY() >= lowerY && playerLoc.getY() <= higherY &&
-                playerLoc.getZ() >= lowerZ && playerLoc.getZ() <= higherZ) {
-                return true;
-            }
-            return false;
-        }
     }
 }

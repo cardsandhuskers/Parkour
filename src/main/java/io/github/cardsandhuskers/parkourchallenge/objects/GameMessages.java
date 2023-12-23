@@ -45,8 +45,8 @@ public class GameMessages {
     public static String pointsDescription(ParkourChallenge plugin) {
         String POINTS_DESCRIPTION = ChatColor.STRIKETHROUGH + "----------------------------------------" + ChatColor.RESET +
                 ChatColor.RED + "" + ChatColor.BOLD + "\nHow the game is Scored (for each level):" +
-                "\n1st Place: " + ChatColor.GOLD + (int)(plugin.getConfig().getInt("maxPoints") * multiplier) + ChatColor.RESET + " points" +
-                "\nWith: -" + ChatColor.GOLD + (int)(plugin.getConfig().getInt("dropOff") * multiplier) + ChatColor.RESET + " point for each player ahead" +
+                "\n1st Place: " + ChatColor.GOLD + (plugin.getConfig().getDouble("maxPoints") * multiplier) + ChatColor.RESET + " points" +
+                "\nWith: -" + ChatColor.GOLD + (plugin.getConfig().getDouble("dropOff") * multiplier) + ChatColor.RESET + " point for each player ahead" +
                 ChatColor.STRIKETHROUGH + "\n----------------------------------------";
         return POINTS_DESCRIPTION;
     }

@@ -12,3 +12,6 @@ minY: 40
 
 #number of fails to give a skip item
 numFails: 20
+
+# minimum amount of time spent on a level required to give a skip item
+levelTime: 60

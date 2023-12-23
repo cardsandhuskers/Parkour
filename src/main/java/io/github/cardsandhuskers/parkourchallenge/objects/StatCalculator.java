@@ -75,8 +75,8 @@ public class StatCalculator {
         //for(Player p:wins.keySet()) if(p != null) System.out.println(p.getDisplayName() + ": " + wins.get(p));
         //System.out.println("~~~~~~~~~~~~~~~");
 
-        FileWriter writer = new FileWriter("plugins/TheDropper/stats.csv", true);
-        FileReader reader = new FileReader("plugins/TheDropper/stats.csv");
+        FileWriter writer = new FileWriter(plugin.getDataFolder() + "/stats.csv", true);
+        FileReader reader = new FileReader(plugin.getDataFolder() + "/stats.csv");
 
         String[] headers = {"Event", "Team", "Name", "Wins", "Fails"};
 
@@ -98,8 +98,9 @@ public class StatCalculator {
         for(Player p:Bukkit.getOnlinePlayers()) {
             if(p == null) continue;
             if(handler.getPlayerTeam(p) == null) continue;
-            int numWins = 0;
-            int numFails = startGameCommand.gameStageHandler.levelHandler.getLevelFails(p);
+            int numWins = startGameCommand.gameStageHandler.levelHandler.getPlayerWins(p);
+            int numFails = startGameCommand.gameStageHandler.levelHandler.getTotalFails(p);
+            System.out.println("WINS: " + numWins + "\nFAILS: " + numFails);
 
             printer.printRecord(eventNum, handler.getPlayerTeam(p).getTeamName(), p.getDisplayName(), numWins, numFails);
         }

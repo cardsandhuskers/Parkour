@@ -11,7 +11,6 @@ import io.github.cardsandhuskers.teams.objects.Team;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -31,12 +30,15 @@ public class GameStageHandler {
         this.plugin = plugin;
     }
 
+    /**
+     * Initial start of the game
+     * Registers the listeners and calls the pregame countdown
+     */
     public void start() {
 
         levelHandler = new LevelHandler(plugin);
         levelHandler.registerLevels();
         numLevels = levelHandler.numLevels;
-
 
         plugin.getServer().getPluginManager().registerEvents(new PlayerClickListener(levelHandler), plugin);
         plugin.getServer().getPluginManager().registerEvents(new PlayerDamageListener(), plugin);
@@ -47,6 +49,10 @@ public class GameStageHandler {
         pregameCountdown();
     }
 
+    /**
+     * Countdown that runs before the game starts (while players are waiting in game world)
+     * teleports players, sets their gamemode, and at the end of the timer deletes the wall blocking them
+     */
     public void pregameCountdown() {
         pregameTimer = new Countdown(plugin,
                 //should be 60
@@ -107,6 +113,10 @@ public class GameStageHandler {
         pregameTimer.scheduleTimer();
     }
 
+    /**
+     * Timer that runs while game is active
+     * Calls the gameEndTimer when done
+     */
     public void gameTimer() {
         gameTimer = new Countdown((JavaPlugin)plugin,
                 plugin.getConfig().getInt("GameTime"),
@@ -121,9 +131,7 @@ public class GameStageHandler {
                 },
 
                 //Timer End
-                () -> {
-                    gameEndTimer();
-                },
+                this::gameEndTimer,
 
                 //Each Second
                 (t) -> {
@@ -142,6 +150,11 @@ public class GameStageHandler {
         // Start scheduling, don't use the "run" method unless you want to skip a second
         gameTimer.scheduleTimer();
     }
+
+    /**
+     * Timer that runs during the end of the game
+     * Triggers the messages in the console for performance
+     */
     public void gameEndTimer() {
         for(Player p:Bukkit.getOnlinePlayers()) {
             p.setInvisible(false);
@@ -206,6 +219,10 @@ public class GameStageHandler {
         gameEndTimer.scheduleTimer();
     }
 
+    /**
+     * Cancels any active timers, used as part of the cancelGame command
+     * @return
+     */
     public boolean cancelTimers() {
         if(pregameTimer != null) pregameTimer.cancelTimer();
         if(gameTimer != null) gameTimer.cancelTimer();
@@ -214,6 +231,11 @@ public class GameStageHandler {
         return true;
     }
 
+    /**
+     * Builds the wall ahead of players before the game starts
+     * Use air as the material to destroy it
+     * @param mat - material you want the wall made of
+     */
     public void buildWall(Material mat) {
         Location pos1 = plugin.getConfig().getLocation("startWall.1");
         Location pos2 = plugin.getConfig().getLocation("startWall.2");

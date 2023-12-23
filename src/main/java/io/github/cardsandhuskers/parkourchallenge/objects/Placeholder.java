@@ -63,14 +63,14 @@ public class Placeholder extends PlaceholderExpansion {
             }
         }
 
-        if(s.equalsIgnoreCase("levelNum")) {
+        if(s.equalsIgnoreCase("levelnum")) {
             int level = startGameCommand.gameStageHandler.levelHandler.getCurrentLevel((Player) p);
             return GameMessages.convertLevel(level);
         }
-        if(s.equalsIgnoreCase("levelFails")) {
+        if(s.equalsIgnoreCase("levelfails")) {
             return startGameCommand.gameStageHandler.levelHandler.getLevelFails((Player) p) + "";
         }
-        if(s.equalsIgnoreCase("totalFails")) {
+        if(s.equalsIgnoreCase("totalfails")) {
             return startGameCommand.gameStageHandler.levelHandler.getTotalFails((Player) p) + "";
         }
         String[] values = s.split("_");
@@ -86,7 +86,7 @@ public class Placeholder extends PlaceholderExpansion {
                 String color = "";
                 if (handler.getPlayerTeam(Bukkit.getPlayer(holder.name)) != null)
                     color = handler.getPlayerTeam(Bukkit.getPlayer(holder.name)).color;
-                return color + holder.name + ChatColor.RESET + ": " + holder.wins;
+                return color + holder.name + ChatColor.RESET + ": " + holder.fails;
 
             }
             if(values[0].equalsIgnoreCase("wins")) {
