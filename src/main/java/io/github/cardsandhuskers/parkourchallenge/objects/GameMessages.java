@@ -1,6 +1,7 @@
 package io.github.cardsandhuskers.parkourchallenge.objects;
 
 import io.github.cardsandhuskers.parkourchallenge.ParkourChallenge;
+import io.github.cardsandhuskers.teams.handlers.TeamHandler;
 import io.github.cardsandhuskers.teams.objects.Team;
 import io.github.cardsandhuskers.teams.objects.TempPointsHolder;
 import org.apache.commons.lang3.StringUtils;
@@ -57,7 +58,7 @@ public class GameMessages {
      */
     public static void announceTopPlayers() {
         ArrayList<TempPointsHolder> tempPointsList = new ArrayList<>();
-        for(Team team: handler.getTeams()) {
+        for(Team team: TeamHandler.getInstance().getTeams()) {
             for(Player p:team.getOnlinePlayers()) {
                 tempPointsList.add(team.getPlayerTempPoints(p));
                 p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);

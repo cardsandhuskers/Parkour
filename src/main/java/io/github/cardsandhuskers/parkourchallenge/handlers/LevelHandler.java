@@ -188,10 +188,11 @@ public class LevelHandler {
                 String message;
                 if(player.equals(p)) {
                     message = ChatColor.AQUA + "You";
+                    message += ChatColor.AQUA + " finished level " + ChatColor.GREEN + GameMessages.convertLevel(level) + ChatColor.AQUA + " in " + ChatColor.GREEN + ChatColor.BOLD;
                 } else {
                     message = handler.getPlayerTeam(p).color + p.getName();
+                    message += ChatColor.GRAY + " finished level " + GameMessages.convertLevel(level) + " in " + ChatColor.BOLD;
                 }
-                message += ChatColor.AQUA + " finished level " + ChatColor.RED + GameMessages.convertLevel(level) + ChatColor.AQUA + " in " + ChatColor.RED + ChatColor.BOLD;
 
                 if(numCompleted % 10 == 0) {
                     message += (numCompleted+1) + "st";
@@ -202,9 +203,12 @@ public class LevelHandler {
                 } else {
                     message += (numCompleted+1) + "th";
                 }
-                message += ChatColor.RESET + "" + ChatColor.AQUA + " place";
+
                 if(player.equals(p)) {
-                    message += " [" + ChatColor.RED + "" + ChatColor.BOLD + "+" + points + ChatColor.RESET + ChatColor.AQUA + "] points";
+                    message += ChatColor.RESET + "" + ChatColor.AQUA + " place";
+                    message += " [" + ChatColor.YELLOW + "" + ChatColor.BOLD + "+" + points + ChatColor.RESET + ChatColor.AQUA + "] points";
+                } else {
+                    message += ChatColor.RESET + "" + ChatColor.GRAY + " place";
                 }
                 player.sendMessage(message);
             }
