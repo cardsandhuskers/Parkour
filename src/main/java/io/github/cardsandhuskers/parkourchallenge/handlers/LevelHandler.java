@@ -233,6 +233,12 @@ public class LevelHandler {
     public void resetPlayer(Player p) {
         UUID u = p.getUniqueId();
         int level = currentLevels.get(u);
+        if(!levels.containsKey(level)) {
+            System.out.println("Level Out of Bounds");
+            p.teleport(plugin.getConfig().getLocation("spawn"));
+            return;
+        }
+
         p.teleport(levels.get(level).start);
 
         if(currentFails.containsKey(u) && currentFails.get(u) >= numFails &&

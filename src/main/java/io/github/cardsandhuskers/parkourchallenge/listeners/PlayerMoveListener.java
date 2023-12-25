@@ -2,6 +2,8 @@ package io.github.cardsandhuskers.parkourchallenge.listeners;
 
 import io.github.cardsandhuskers.parkourchallenge.ParkourChallenge;
 import io.github.cardsandhuskers.parkourchallenge.handlers.LevelHandler;
+import org.bukkit.GameMode;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -16,13 +18,17 @@ public class PlayerMoveListener implements Listener {
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent e) {
-        levelHandler.onLevelComplete(e.getPlayer());
-        if(e.getPlayer().getLocation().getY() <= plugin.getConfig().getInt("minY")) {
+        Player p = e.getPlayer();
+
+        levelHandler.onLevelComplete(p);
+        if(p.getGameMode() == GameMode.SPECTATOR) {
+            p.teleport(plugin.getConfig().getLocation("spawn"));
+        } else if(p.getLocation().getY() <= plugin.getConfig().getInt("minY")) {
             if(ParkourChallenge.gameState == ParkourChallenge.State.GAME_STARTING) {
-                e.getPlayer().teleport(plugin.getConfig().getLocation("spawn"));
+                p.teleport(plugin.getConfig().getLocation("spawn"));
             } else {
-                levelHandler.addFail(e.getPlayer());
-                levelHandler.resetPlayer(e.getPlayer());
+                levelHandler.addFail(p);
+                levelHandler.resetPlayer(p);
             }
         }
     }
