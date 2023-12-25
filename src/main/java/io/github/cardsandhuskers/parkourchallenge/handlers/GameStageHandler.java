@@ -9,6 +9,8 @@ import io.github.cardsandhuskers.parkourchallenge.objects.Countdown;
 import io.github.cardsandhuskers.parkourchallenge.objects.GameMessages;
 import io.github.cardsandhuskers.teams.handlers.TeamHandler;
 import io.github.cardsandhuskers.teams.objects.Team;
+import io.github.cardsandhuskers.parkourchallenge.objects.Stats;
+
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
@@ -25,10 +27,12 @@ public class GameStageHandler {
     private Countdown pregameTimer, gameTimer, gameEndTimer;
     public LevelHandler levelHandler;
     public int numLevels;
+    Stats stats;
 
 
     public GameStageHandler(ParkourChallenge plugin) {
         this.plugin = plugin;
+        this.stats = new Stats("Player,Team,Level,Finish,Time");
     }
 
     /**
@@ -37,7 +41,7 @@ public class GameStageHandler {
      */
     public void start() {
 
-        levelHandler = new LevelHandler(plugin);
+        levelHandler = new LevelHandler(plugin,stats);
         levelHandler.registerLevels();
         numLevels = levelHandler.numLevels;
 
@@ -176,6 +180,16 @@ public class GameStageHandler {
                     HandlerList.unregisterAll(plugin);
                     ParkourChallenge.gameState = ParkourChallenge.State.GAME_OVER;
 
+                    int eventNum = -1;
+                    try {
+                        eventNum = Bukkit.getPluginManager().getPlugin("LobbyPlugin")
+                            .getConfig().getInt("eventNum");
+                    }   catch (Exception e) 
+                        {eventNum = 1;}
+                        
+                    String fileName = "parkourStats" + Integer.toString(eventNum);
+
+                    stats.writeToFile(plugin.getDataFolder().toPath().toString(), fileName);
                 },
 
                 //Timer End

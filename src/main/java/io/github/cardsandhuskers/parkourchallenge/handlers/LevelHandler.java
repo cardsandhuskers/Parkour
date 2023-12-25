@@ -5,6 +5,7 @@ import io.github.cardsandhuskers.parkourchallenge.objects.GameMessages;
 import io.github.cardsandhuskers.parkourchallenge.objects.Level;
 import io.github.cardsandhuskers.teams.handlers.TeamHandler;
 import io.github.cardsandhuskers.teams.objects.Team;
+import io.github.cardsandhuskers.parkourchallenge.objects.Stats;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -25,9 +26,11 @@ public class LevelHandler {
     private HashMap<Integer, Integer> playersCompleted;
     private HashMap<UUID, Integer> currentLevels, currentFails, totalFails, levelTime, levelWins;
     private int numFails;
+    private Stats stats;
 
-    public LevelHandler(ParkourChallenge plugin) {
+    public LevelHandler(ParkourChallenge plugin, Stats stats) {
         this.plugin = plugin;
+        this.stats = stats;
     }
 
     /**
@@ -163,7 +166,11 @@ public class LevelHandler {
             p.setGameMode(GameMode.SPECTATOR);
             p.sendMessage("You finished all the levels!");
         }
-    }
+
+        //Player,Team,Level,Finish,Time
+        String lineEntry = p.getName() + "," + handler.getPlayerTeam(p).getTeamName() + "," + GameMessages.convertLevel(playerLevel) + ",skipped," + ParkourChallenge.timeVar;
+        stats.addEntry(lineEntry);
+}
 
     /**
      * Handles the logic for giving points to a player after completing a level
@@ -211,6 +218,9 @@ public class LevelHandler {
                     message += ChatColor.RESET + "" + ChatColor.GRAY + " place";
                 }
                 player.sendMessage(message);
+                //Player,Team,Level,Finish,Time
+                String lineEntry = p.getName() + "," + handler.getPlayerTeam(p).getTeamName() + "," + GameMessages.convertLevel(level) + "," + (numCompleted+1) + "," + ParkourChallenge.timeVar;
+                stats.addEntry(lineEntry);
             }
             t.addTempPoints(p, points);
         }
