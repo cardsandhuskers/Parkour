@@ -20,7 +20,7 @@ public class PlayerMoveListener implements Listener {
     public void onPlayerMove(PlayerMoveEvent e) {
         Player p = e.getPlayer();
 
-        levelHandler.onLevelComplete(p);
+        levelHandler.checkLevelComplete(p);
         levelHandler.checkFail(p);
 
          //if(p.getLocation().getY() <= plugin.getConfig().getInt("minY")) {

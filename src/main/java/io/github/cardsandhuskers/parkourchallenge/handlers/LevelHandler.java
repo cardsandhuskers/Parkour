@@ -84,12 +84,20 @@ public class LevelHandler {
      * updates level as completed and plays fireworks/sounds
      * @param p - player
      */
-    public void onLevelComplete(Player p) {
+    public void checkLevelComplete(Player p) {
         UUID u = p.getUniqueId();
         int playerLevel = currentLevels.get(u);
+        
         if(playerLevel > numLevels) return;
 
         if(levels.get(playerLevel).playerInEnd(p)) {
+            //stats -> Player,Team,Level,Finish,Time
+            int numCompleted = playersCompleted.get(playerLevel);
+
+            String lineEntry = p.getName() + "," + handler.getPlayerTeam(p).getTeamName() + "," + GameMessages.convertLevel(playerLevel) + "," + 
+                (numCompleted+1) + "," + ParkourChallenge.timeVar + "," + getLevelFails(p);
+            stats.addEntry(lineEntry);
+
             currentLevels.put(u, playerLevel + 1);
             currentFails.put(u, 0);
             levelTime.put(u, 0);
@@ -158,6 +166,11 @@ public class LevelHandler {
         int playerLevel = currentLevels.get(u);
         if(playerLevel >= numLevels) return;
 
+        //Player,Team,Level,Finish,Time,Fails
+        String lineEntry = p.getName() + "," + handler.getPlayerTeam(p).getTeamName() + "," + GameMessages.convertLevel(playerLevel) 
+            + ",skipped," + ParkourChallenge.timeVar + "," + getLevelFails(p);
+        stats.addEntry(lineEntry);
+
         currentLevels.put(u, playerLevel + 1);
         currentFails.put(u, 0);
         levelTime.put(u, 0);
@@ -179,12 +192,7 @@ public class LevelHandler {
             p.setGameMode(GameMode.SPECTATOR);
             p.sendMessage("You finished all the levels!");
         }
-
-        //Player,Team,Level,Finish,Time,Fails
-        String lineEntry = p.getName() + "," + handler.getPlayerTeam(p).getTeamName() + "," + GameMessages.convertLevel(playerLevel) 
-            + ",skipped," + ParkourChallenge.timeVar + "," + getLevelFails(p);
-        stats.addEntry(lineEntry);
-}
+    }
 
     /**
      * Handles the logic for giving points to a player after completing a level
@@ -232,10 +240,7 @@ public class LevelHandler {
                     message += ChatColor.RESET + "" + ChatColor.GRAY + " place";
                 }
                 player.sendMessage(message);
-                //Player,Team,Level,Finish,Time
-                String lineEntry = p.getName() + "," + handler.getPlayerTeam(p).getTeamName() + "," + GameMessages.convertLevel(level) + "," + 
-                    (numCompleted+1) + "," + ParkourChallenge.timeVar + "," + getLevelFails(p);
-                stats.addEntry(lineEntry);
+                
             }
             t.addTempPoints(p, points);
         }
