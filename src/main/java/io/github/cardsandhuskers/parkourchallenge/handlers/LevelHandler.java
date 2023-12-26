@@ -122,6 +122,19 @@ public class LevelHandler {
         }
     }
 
+    public boolean checkFail(Player p) {
+        UUID u = p.getUniqueId();
+        int playerLevel = currentLevels.get(u);
+        if(playerLevel > numLevels) return false;
+
+        Level level = levels.get(playerLevel);
+
+        if(p.getLocation().getY() <= level.lowerY - 20) {
+            return true;
+        }
+        return false;
+    }
+
     /**
      * Increments the amount of time a player has been on a level every second
      * In order to use a skip, there is a minimum amount of time that a player must be on a level for.

@@ -21,15 +21,16 @@ public class PlayerMoveListener implements Listener {
         Player p = e.getPlayer();
 
         levelHandler.onLevelComplete(p);
-        if(p.getGameMode() == GameMode.SPECTATOR) {
+        levelHandler.checkFail(p);
+
+         //if(p.getLocation().getY() <= plugin.getConfig().getInt("minY")) {
+        if(p.getGameMode() == GameMode.SPECTATOR && p.getLocation().getY() <= 0) {
             p.teleport(plugin.getConfig().getLocation("spawn"));
-        } else if(p.getLocation().getY() <= plugin.getConfig().getInt("minY")) {
-            if(ParkourChallenge.gameState == ParkourChallenge.State.GAME_STARTING) {
-                p.teleport(plugin.getConfig().getLocation("spawn"));
-            } else {
-                levelHandler.addFail(p);
-                levelHandler.resetPlayer(p);
-            }
+        } else if(ParkourChallenge.gameState == ParkourChallenge.State.GAME_STARTING && p.getLocation().getY() <= 0) {
+            p.teleport(plugin.getConfig().getLocation("spawn"));
+        } else if(levelHandler.checkFail(p)) {
+            levelHandler.addFail(p);
+            levelHandler.resetPlayer(p);
         }
     }
 
