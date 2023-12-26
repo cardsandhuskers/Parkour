@@ -167,8 +167,9 @@ public class LevelHandler {
             p.sendMessage("You finished all the levels!");
         }
 
-        //Player,Team,Level,Finish,Time
-        String lineEntry = p.getName() + "," + handler.getPlayerTeam(p).getTeamName() + "," + GameMessages.convertLevel(playerLevel) + ",skipped," + ParkourChallenge.timeVar;
+        //Player,Team,Level,Finish,Time,Fails
+        String lineEntry = p.getName() + "," + handler.getPlayerTeam(p).getTeamName() + "," + GameMessages.convertLevel(playerLevel) 
+            + ",skipped," + ParkourChallenge.timeVar + "," + getLevelFails(p);
         stats.addEntry(lineEntry);
 }
 
@@ -219,7 +220,8 @@ public class LevelHandler {
                 }
                 player.sendMessage(message);
                 //Player,Team,Level,Finish,Time
-                String lineEntry = p.getName() + "," + handler.getPlayerTeam(p).getTeamName() + "," + GameMessages.convertLevel(level) + "," + (numCompleted+1) + "," + ParkourChallenge.timeVar;
+                String lineEntry = p.getName() + "," + handler.getPlayerTeam(p).getTeamName() + "," + GameMessages.convertLevel(level) + "," + 
+                    (numCompleted+1) + "," + ParkourChallenge.timeVar + "," + getLevelFails(p);
                 stats.addEntry(lineEntry);
             }
             t.addTempPoints(p, points);

@@ -32,7 +32,7 @@ public class GameStageHandler {
 
     public GameStageHandler(ParkourChallenge plugin) {
         this.plugin = plugin;
-        this.stats = new Stats("Player,Team,Level,Finish,Time");
+        this.stats = new Stats("Player,Team,Level,Finish,Time,Fails");
     }
 
     /**
