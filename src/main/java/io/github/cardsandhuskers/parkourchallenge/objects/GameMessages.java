@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 import static io.github.cardsandhuskers.parkourchallenge.ParkourChallenge.multiplier;
 import static io.github.cardsandhuskers.teams.Teams.handler;
@@ -135,15 +136,9 @@ public class GameMessages {
         }
     }
 
-    public static String convertLevel(int levelNum) {
-        int section = levelNum / 3 + 1;
-        if(levelNum % 3 == 0) section--;
-
-        String level = section + "-";
-        if(levelNum % 3 == 1) level+= 1;
-        else if(levelNum % 3 == 2) level+= 2;
-        else if(levelNum % 3 == 0) level+= 3;
-        return level;
+    public static String convertLevel(int levelNum, ParkourChallenge plugin) {
+        List<String> levelNames = plugin.getConfig().getStringList("levelNames");
+        return levelNames.get(levelNum - 1);
     }
 
 }

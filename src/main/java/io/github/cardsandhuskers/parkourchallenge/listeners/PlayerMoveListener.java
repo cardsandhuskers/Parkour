@@ -20,8 +20,9 @@ public class PlayerMoveListener implements Listener {
     public void onPlayerMove(PlayerMoveEvent e) {
         Player p = e.getPlayer();
 
-        levelHandler.checkLevelComplete(p);
-        levelHandler.checkFail(p);
+        if(levelHandler.checkLevelComplete(p)) {
+            return;
+        }
 
          //if(p.getLocation().getY() <= plugin.getConfig().getInt("minY")) {
         if(p.getGameMode() == GameMode.SPECTATOR && p.getLocation().getY() <= 0) {

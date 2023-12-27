@@ -65,7 +65,7 @@ public class Placeholder extends PlaceholderExpansion {
 
         if(s.equalsIgnoreCase("levelnum")) {
             int level = startGameCommand.gameStageHandler.levelHandler.getCurrentLevel((Player) p);
-            return GameMessages.convertLevel(level);
+            return GameMessages.convertLevel(level, plugin);
         }
         if(s.equalsIgnoreCase("levelfails")) {
             return startGameCommand.gameStageHandler.levelHandler.getLevelFails((Player) p) + "";

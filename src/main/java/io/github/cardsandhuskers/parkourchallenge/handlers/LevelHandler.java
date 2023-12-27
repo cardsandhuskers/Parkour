@@ -84,17 +84,17 @@ public class LevelHandler {
      * updates level as completed and plays fireworks/sounds
      * @param p - player
      */
-    public void checkLevelComplete(Player p) {
+    public boolean checkLevelComplete(Player p) {
         UUID u = p.getUniqueId();
         int playerLevel = currentLevels.get(u);
         
-        if(playerLevel > numLevels) return;
-
+        if(playerLevel > numLevels) return false;
+        boolean complete;
         if(levels.get(playerLevel).playerInEnd(p)) {
             //stats -> Player,Team,Level,Finish,Time
             int numCompleted = playersCompleted.get(playerLevel);
 
-            String lineEntry = p.getName() + "," + handler.getPlayerTeam(p).getTeamName() + "," + GameMessages.convertLevel(playerLevel) + "," + 
+            String lineEntry = p.getName() + "," + handler.getPlayerTeam(p).getTeamName() + "," + GameMessages.convertLevel(playerLevel, plugin) + "," +
                 (numCompleted+1) + "," + ParkourChallenge.timeVar + "," + getLevelFails(p);
             stats.addEntry(lineEntry);
 
@@ -122,12 +122,17 @@ public class LevelHandler {
                 p.setGameMode(GameMode.SPECTATOR);
                 p.sendMessage("You finished all the levels!");
             }
+            complete = true;
+        } else {
+            complete = false;
         }
         int numPlayers = 0;
         for(Team t:handler.getTeams()) for(Player pl:t.getOnlinePlayers()) numPlayers++;
         if(playersCompleted.get(numLevels) == numPlayers) {
             //TODO: Game Over!
         }
+
+        return complete;
     }
 
     public boolean checkFail(Player p) {
@@ -167,7 +172,7 @@ public class LevelHandler {
         if(playerLevel >= numLevels) return;
 
         //Player,Team,Level,Finish,Time,Fails
-        String lineEntry = p.getName() + "," + handler.getPlayerTeam(p).getTeamName() + "," + GameMessages.convertLevel(playerLevel) 
+        String lineEntry = p.getName() + "," + handler.getPlayerTeam(p).getTeamName() + "," + GameMessages.convertLevel(playerLevel, plugin)
             + ",skipped," + ParkourChallenge.timeVar + "," + getLevelFails(p);
         stats.addEntry(lineEntry);
 
@@ -175,7 +180,7 @@ public class LevelHandler {
         currentFails.put(u, 0);
         levelTime.put(u, 0);
 
-        p.sendMessage(ChatColor.AQUA + "You skipped level " + ChatColor.RED + GameMessages.convertLevel(playerLevel));
+        p.sendMessage(ChatColor.AQUA + "You skipped level " + ChatColor.RED + GameMessages.convertLevel(playerLevel, plugin));
         p.playSound(p.getLocation(), Sound.ENTITY_BLAZE_DEATH, 1, 1);
 
         resetPlayer(p);
@@ -217,10 +222,10 @@ public class LevelHandler {
                 String message;
                 if(player.equals(p)) {
                     message = ChatColor.AQUA + "You";
-                    message += ChatColor.AQUA + " finished level " + ChatColor.GREEN + GameMessages.convertLevel(level) + ChatColor.AQUA + " in " + ChatColor.GREEN + ChatColor.BOLD;
+                    message += ChatColor.AQUA + " finished level " + ChatColor.GREEN + GameMessages.convertLevel(level, plugin) + ChatColor.AQUA + " in " + ChatColor.GREEN + ChatColor.BOLD;
                 } else {
                     message = handler.getPlayerTeam(p).color + p.getName();
-                    message += ChatColor.GRAY + " finished level " + GameMessages.convertLevel(level) + " in " + ChatColor.BOLD;
+                    message += ChatColor.GRAY + " finished level " + GameMessages.convertLevel(level, plugin) + " in " + ChatColor.BOLD;
                 }
 
                 if(numCompleted % 10 == 0) {
